@@ -53,7 +53,7 @@ module.exports = (file) => {
     },
   })
 
-  return styleSheets.map(({id, keys, keyNames, binding}) => {
+  const sheets = styleSheets.map(({id, keys, keyNames, binding}) => {
     const warnings = []
     const referenced = binding.referencePaths.map(ref => {
       if (ref.parent.type !== 'MemberExpression') {
@@ -89,6 +89,7 @@ module.exports = (file) => {
 
     return {loc: id.loc, code: locLines(lines, id.loc), warnings, unused, missing}
   })
+  return {sheets, lines}
 }
 
 
