@@ -47,39 +47,45 @@ const showSheet = ({warnings, missing, unused}) => {
 }
 
 const run = (file, cmd) => {
-  console.log('File: ', file)
-
   const {sheets, lines} = processFile(file)
 
   if (!sheets.length) {
-    console.log("No stylesheets found")
-    return 0
+    return {removed: 0, skipped: []}
   }
 
   if (cmd === 'check') {
+    console.log('File: ', file)
     sheets.forEach(showSheet)
-    return 0
+    return {removed: 0, skipped: []}
   } else {
     const toRemove = []
+    let skipped = 0
 
     sheets.forEach(sheet => {
       if (!sheet.unused.length) return
       if (sheet.warnings.length) {
         if (cmd === 'fix') {
-          return console.log('Not removing unused styles - fix warnings or use `fix-force`')
+          skipped += sheet.unused.length
+          return
         }
       }
       toRemove.push(...sheet.unused)
     })
 
+    if (skipped === 0 && !toRemove.length) {
+      return {removed: 0, skipped: []}
+    }
+
+    console.log('File: ', file)
+    if (skipped > 0) {
+      console.log(`Not removing ${skipped} potentially unused styles - use 'check' to view warnings or use 'fix-force'`)
+    }
     if (toRemove.length) {
       const fixed = removeUnused(lines, toRemove)
       fs.writeFileSync(file, fixed.join('\n'))
       console.log(`Removed ${toRemove.length} unused styles`)
-    } else {
-      console.log('Nothing to remove')
     }
-    return toRemove.length
+    return {removed: toRemove.length, skipped: skipped > 0 ? [{file, count: skipped}] : []}
   }
 }
 
@@ -92,15 +98,23 @@ if (!cmd || !file || cmd === 'help' || cmds.indexOf(cmd) === -1) {
   process.exit()
 }
 
-const files = glob.sync(file)
+const files = glob.sync(file).filter(x => x.indexOf('/node_modules/') === -1)
+console.log(files.length)
 
 const add = (a, b) => a + b
+const append = (a, b) => [...a, ...b]
 
-const removed = files.map(file => run(file, cmd)).reduce(add)
+const results = files.map(file => run(file, cmd))
+const removed = results.map(r => r.removed).reduce(add)
 
 if (cmd !== 'check') {
   console.log()
   console.log(`Removed ${removed} unused styles`)
+  const skipped = results.map(r => r.skipped).reduce(append)
+  if (skipped.length) {
+    const total = skipped.map(s => s.count).reduce(add)
+    console.log(`Skipped ${total} potentially unused styles in the following ${skipped.length} files b/c of unusual stylesheet references. Run with the 'check' command for more info`)
+    skipped.forEach(f => console.log(' -', f.count, f.file))
+  }
 }
-
 
