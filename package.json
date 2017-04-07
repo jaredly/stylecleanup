@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "babel-traverse": "^6.24.1",
+    "babylon": "^6.16.1"
+  }
+}
