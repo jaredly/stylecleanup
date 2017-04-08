@@ -23,11 +23,21 @@ if (process.argv.length === 2) {
 }
 
 if (!cmd || !files.length || cmd === 'help' || cmds.indexOf(cmd) === -1) {
-  console.log("Usage: stylecleanup [command] some/file/to/check.js")
-  console.log("  command: one of 'check', 'fix', 'fix-force'")
-  console.log("  globs are also supported, e.g.")
-  console.log()
-  console.log("  stylecleanup check './src/**/*.js'")
+  console.log(`\
+Usage: stylecleanup [command] some/file/to/check.js
+  command: one of 'check', 'fix', 'fix-force'
+  globs are also supported, e.g.
+
+  stylecleanup check './src/**/*.js'
+
+  check: find & report missing & unused styles
+  fix: remove all unused styles, but skip styles that *might* be used, but
+    can't be verified because e.g. the stylesheet variable is passed around,
+    or there's a computed property access. If you do 'styles[something]' it
+    might be accessing anything, so we can't know for sure that apparently
+    unused styles are actually unused.
+  fix-force: remove all unnused styles, and all 'potentially' unused styles
+`)
   process.exit()
 }
 

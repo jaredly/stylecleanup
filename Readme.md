@@ -1,6 +1,6 @@
 # Style Cleanup
 
-Wouldn't it me nice if you could automatically find & remove unused React
+Wouldn't it be nice if you could automatically find & remove unused React
 Native and Aphrodite style declarations?
 
 `stylecleanup` is here to help!
@@ -10,6 +10,8 @@ $ yarn global add stylecleanup
 # or
 $ npm install -g stylecleanup
 ```
+
+![screen capture demo](docs/screencap.gif)
 
 ## Usage
 
