@@ -21,14 +21,19 @@ const showWarning = warning => {
   }
 }
 
+const showCode = (code, loc) => {
+  if (code.indexOf('\n') !== -1) return console.log(code)
+  console.log(code.slice(0, loc.start.column) + chalk.red(code.slice(loc.start.column, loc.end.column)) + code.slice(loc.end.column))
+}
+
 const showMissing = ({key, loc, code}) => {
-  console.log(`Missing style '${key}'at ${pos(loc)}`)
-  console.log(code)
+  console.log(`Missing style '${key}' at ${pos(loc)}`)
+  showCode(code, loc)
 }
 
 const showUnused = ({key, loc, code}) => {
   console.log(`Unused style declaration '${key}' at ${pos(loc)}`)
-  console.log(code)
+  showCode(code, loc)
 }
 
 const showSheet = ({warnings, missing, unused}) => {

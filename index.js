@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 
 const glob = require('glob')
 const path = require('path')
@@ -12,30 +13,35 @@ function resolveHome(filepath) {
     return filepath
 }
 
-let [_, __, cmd, file] = process.argv
+let [_, __, cmd, ...files] = process.argv
 
 const cmds = ['check', 'fix', 'fix-force']
 
 if (process.argv.length === 2) {
   cmd = 'check'
-  file = './**/*.js'
+  files = ['./**/*.js']
 }
 
-if (!cmd || !file || cmd === 'help' || cmds.indexOf(cmd) === -1) {
-  console.log("Usage: index.js [command] some/file/to/check.js")
+if (!cmd || !files.length || cmd === 'help' || cmds.indexOf(cmd) === -1) {
+  console.log("Usage: stylecleanup [command] some/file/to/check.js")
   console.log("  command: one of 'check', 'fix', 'fix-force'")
+  console.log("  globs are also supported, e.g.")
+  console.log()
+  console.log("  stylecleanup check './src/**/*.js'")
   process.exit()
 }
-
-const files = glob.sync(resolveHome(file))
-  .filter(x => x.indexOf('/node_modules/') === -1)
-
-console.log(`Checking ${files.length} files matching ${file}`)
 
 const add = (a, b) => a + b
 const append = (a, b) => [...a, ...b]
 
-const results = files.map(file => processFile(file, cmd))
+const allfiles = files.map(
+  file => glob.sync(resolveHome(file))
+    .filter(x => x.indexOf('/node_modules/') === -1)
+).reduce(append, [])
+
+console.log(`Checking ${allfiles.length} files matching ${files.join(' ')}`)
+
+const results = allfiles.map(file => processFile(file, cmd))
 const removed = results.map(r => r.removed).reduce(add, 0)
 
 if (cmd !== 'check') {
