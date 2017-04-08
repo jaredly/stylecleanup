@@ -1,7 +1,6 @@
 const babylon = require('babylon')
 const traverse = require('babel-traverse').default
 
-
 const fs = require('fs')
 
 const isStyleSheetCreate = path => {

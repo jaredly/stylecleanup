@@ -1,7 +1,15 @@
 {
+  "name": "stylecleanup",
   "dependencies": {
     "babel-traverse": "^6.24.1",
     "babylon": "^6.16.1",
+    "chalk": "^1.1.3",
     "glob": "^7.1.1"
-  }
+  },
+  "version": "1.0.0",
+  "description": "Lint & fix unused aphrodite and react-native styles",
+  "main": "index.js",
+  "repository": "git@github.com:jaredly/stylecleanup.git",
+  "author": "Jared Forsyth <jared@jaredforsyth.com>",
+  "license": "MIT"
 }
