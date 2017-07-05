@@ -53,6 +53,9 @@ module.exports = (file) => {
   })
 
   const sheets = styleSheets.map(({id, keys, keyNames, binding}) => {
+    if (!binding) {
+      return null
+    }
     const warnings = []
     const referenced = binding.referencePaths.map(ref => {
       if (ref.parent.type !== 'MemberExpression') {
@@ -87,7 +90,7 @@ module.exports = (file) => {
     }))
 
     return {loc: id.loc, code: locLines(lines, id.loc), warnings, unused, missing}
-  })
+  }).filter(x => x)
   return {sheets, lines}
 }
 
